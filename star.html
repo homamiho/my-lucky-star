@@ -1,24 +1,232 @@
-<!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01//EN" "http://www.w3.org/TR/html4/strict.dtd">
-<html>
+<!DOCTYPE html>
+<html lang="zh-TW">
 <head>
-  <meta http-equiv="Content-Type" content="text/html; charset=utf-8">
-  <meta http-equiv="Content-Style-Type" content="text/css">
-  <title></title>
-  <meta name="Generator" content="Cocoa HTML Writer">
-  <meta name="CocoaVersion" content="2575.7">
-  <style type="text/css">
-    body {background-color: #fff8ec}
-    p.p2 {margin: 0.0px 0.0px 12.0px 0.0px; text-align: center; font: 12.0px 'PingFang TC'; color: #4a312a; -webkit-text-stroke: #4a312a}
-    p.p3 {margin: 0.0px 0.0px 0.0px 0.0px; text-align: center; font: 11.0px 'PingFang TC'; color: #ffffff; -webkit-text-stroke: #ffffff}
-    span.s1 {font: 14.0px 'Apple Color Emoji'; font-kerning: none; background-color: rgba(255, 255, 255, 0.7)}
-    span.s2 {font: 14.0px 'PingFang TC'; font-kerning: none; background-color: rgba(255, 255, 255, 0.7)}
-    span.s3 {font-kerning: none; background-color: rgba(255, 255, 255, 0.7)}
-    span.s4 {font-kerning: none; background-color: #a388d2}
-  </style>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>星巡極選 - 全民魔法水晶球</title>
+    <style>
+        :root {
+            --primary-gold: #ffd700;
+            --magic-purple: #b39ddb;
+            --bg-cream: #fff9f0;
+        }
+        body {
+            background-color: var(--bg-cream);
+            font-family: "Microsoft JhengHei", cursive;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            margin: 0;
+            color: #5d4037;
+        }
+        #app {
+            width: 90%;
+            max-width: 400px;
+            background: rgba(255, 255, 255, 0.7);
+            border-radius: 40px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            border: 2px dashed #d7ccc8;
+        }
+        /* 輸入區樣式 */
+        .input-group { margin-bottom: 20px; }
+        input {
+            padding: 10px;
+            border-radius: 15px;
+            border: 1px solid var(--magic-purple);
+            outline: none;
+            width: 80%;
+            text-align: center;
+        }
+        /* 水晶球與噴發效果 */
+        #crystal-container {
+            position: relative;
+            width: 260px;
+            height: 260px;
+            margin: 0 auto;
+        }
+        #ball {
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle at 30% 30%, #fff, #e1bee7 40%, #9575cd 100%);
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            flex-wrap: wrap;
+            align-content: center;
+            justify-content: center;
+            position: relative;
+            z-index: 2;
+            box-shadow: 0 0 50px rgba(149, 117, 205, 0.3);
+            transition: transform 0.1s;
+        }
+        #ball:active { transform: scale(0.95); }
+        /* 金粉粒子 */
+        .particle {
+            position: absolute;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            z-index: 3;
+        }
+        /* 號碼樣式 */
+        .num {
+            width: 40px;
+            height: 40px;
+            background: white;
+            border-radius: 50%;
+            margin: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: bold;
+            color: #673ab7;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            animation: emerge 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+            opacity: 0;
+        }
+        @keyframes emerge {
+            from { transform: scale(0) rotate(-20deg); opacity: 0; }
+            to { transform: scale(1) rotate(0deg); opacity: 1; }
+        }
+        .btn {
+            background: var(--magic-purple);
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+            margin-top: 10px;
+        }
+    </style>
 </head>
 <body>
-<h3 style="margin: 0.0px 0.0px 14.0px 0.0px; text-align: center; font: 14.0px 'Hannotate TC'; color: #4a312a; -webkit-text-stroke: #4a312a"><span class="s1">🔮</span><span class="s2"><b> </b></span><span class="s3">輸入你的能量密碼</span></h3>
-<p class="p2"><span class="s3">你的生日</span></p>
-<p class="p3"><span class="s4">連結星際能量</span></p>
+
+<div id="app">
+    <div id="setup-screen">
+        <h3>🔮 輸入你的能量密碼</h3>
+        <div class="input-group">
+            <p>你的生日</p>
+            <input type="date" id="birthday" value="1987-07-06">
+        </div>
+        <button class="btn" onclick="startApp()">連結星際能量</button>
+    </div>
+
+    <div id="main-app" style="display:none;">
+        <h4 id="user-info">占星精靈準備中...</h4>
+        <div id="crystal-container">
+            <div id="ball" onclick="igniteMagic()">
+                <div style="color:white; font-size:0.9rem;">輕觸噴發魔法</div>
+            </div>
+        </div>
+        <p id="hint" style="color:#9575cd; min-height: 3em;"></p>
+        <button class="btn" style="background:#d7ccc8;" onclick="location.reload()">重新連結</button>
+    </div>
+</div>
+
+<script>
+    let userZodiac = "";
+
+    function getZodiac(date) {
+        const m = date.getMonth() + 1;
+        const d = date.getDate();
+        if ((m == 3 && d >= 21) || (m == 4 && d <= 19)) return "牡羊";
+        if ((m == 4 && d >= 20) || (m == 5 && d <= 20)) return "金牛";
+        if ((m == 5 && d >= 21) || (m == 6 && d <= 21)) return "雙子";
+        if ((m == 6 && d >= 22) || (m == 7 && d <= 22)) return "巨蟹";
+        if ((m == 7 && d >= 23) || (m == 8 && d <= 22)) return "獅子";
+        if ((m == 8 && d >= 23) || (m == 9 && d <= 22)) return "處女";
+        if ((m == 9 && d >= 23) || (m == 10 && d <= 23)) return "天秤";
+        if ((m == 10 && d >= 24) || (m == 11 && d <= 22)) return "天蠍";
+        if ((m == 11 && d >= 23) || (m == 12 && d <= 21)) return "射手";
+        if ((m == 12 && d >= 22) || (m == 1 && d <= 19)) return "摩羯";
+        if ((m == 1 && d >= 20) || (m == 2 && d <= 18)) return "水瓶";
+        return "雙魚";
+    }
+
+    function startApp() {
+        const bday = document.getElementById('birthday').value;
+        if(!bday) return alert("請選生日喔！");
+        userZodiac = getZodiac(new Date(bday));
+        document.getElementById('setup-screen').style.display = 'none';
+        document.getElementById('main-app').style.display = 'block';
+        document.getElementById('user-info').innerText = `✨ ${userZodiac}座的朋友，歡迎`;
+    }
+
+    function igniteMagic() {
+        const ball = document.getElementById('ball');
+        const hint = document.getElementById('hint');
+        ball.innerHTML = '';
+        
+        // 1. 強烈金粉噴發效果
+        for(let i=0; i<40; i++) {
+            createParticle();
+        }
+
+        hint.innerText = "✨ 金粉噴發中！正在校正逆行能量...";
+
+        // 2. 占星選號邏輯
+        setTimeout(() => {
+            let nums = new Set();
+            while(nums.size < 6) {
+                let n = Math.floor(Math.random() * 38) + 1;
+                // 模擬逆行邏輯：如果是 3 月份，針對部分星座號碼翻轉
+                if(n % 7 === 0) n = 39 - n; 
+                nums.add(n);
+            }
+            const sorted = Array.from(nums).sort((a, b) => a - b);
+            
+            sorted.forEach((n, i) => {
+                setTimeout(() => {
+                    const bubble = document.createElement('div');
+                    bubble.className = 'num';
+                    bubble.innerText = n < 10 ? '0'+n : n;
+                    ball.appendChild(bubble);
+                }, i * 100);
+            });
+
+            // 特別號
+            setTimeout(() => {
+                const spec = document.createElement('div');
+                spec.className = 'num';
+                spec.style.background = '#ffd700';
+                spec.innerText = Math.floor(Math.random() * 8) + 1;
+                ball.appendChild(spec);
+                hint.innerText = `🔮 根據${userZodiac}座能量產出！祝你好運！`;
+            }, 800);
+        }, 300);
+    }
+
+    function createParticle() {
+        const container = document.getElementById('crystal-container');
+        const p = document.createElement('div');
+        p.className = 'particle';
+        const size = Math.random() * 6 + 2;
+        p.style.width = size + 'px';
+        p.style.height = size + 'px';
+        
+        // 初始位置在球心
+        p.style.left = '50%';
+        p.style.top = '50%';
+        
+        container.appendChild(p);
+
+        const angle = Math.random() * Math.PI * 2;
+        const velocity = Math.random() * 150 + 50;
+        const tx = Math.cos(angle) * velocity;
+        const ty = Math.sin(angle) * velocity;
+
+        p.animate([
+            { transform: 'translate(-50%, -50%) scale(1)', opacity: 1 },
+            { transform: `translate(${tx}px, ${ty}px) scale(0)`, opacity: 0 }
+        ], {
+            duration: 800 + Math.random() * 400,
+            easing: 'cubic-bezier(0, .9, .57, 1)'
+        }).onfinish = () => p.remove();
+    }
+</script>
+
 </body>
 </html>
